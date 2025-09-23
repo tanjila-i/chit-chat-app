@@ -83,3 +83,39 @@ export const userVerifyEmail = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+export const userLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Password incorrect" });
+    }
+
+    const token = await genereateToken(res, user._id);
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      user,
+      token,
+      message: "User Login Succfully",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(501).json({ success: false, message: error.message });
+  }
+};
