@@ -52,3 +52,34 @@ export const register = async (req, res) => {
     console.log(error);
   }
 };
+
+export const userVerifyEmail = async (req, res) => {
+  const { code } = req.body;
+
+  try {
+    const verifyedUser = await userModel.findOne({
+      verificationToken: code,
+      verificationTokenExpiresAt: { $gt: Date.now() },
+    });
+
+    if (!verifyedUser) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired verification code",
+      });
+    }
+
+    verifyedUser.isVerified = true;
+    verifyedUser.verificationToken = undefined;
+    verifyedUser.verificationTokenExpiresAt = undefined;
+
+    await verifyedUser.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "User is verifyed successfully" });
+  } catch (error) {
+    console.log("error in verifyEmail ", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
