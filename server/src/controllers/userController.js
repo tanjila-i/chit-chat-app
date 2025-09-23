@@ -1,6 +1,7 @@
 import { genereateToken } from "../middlewares/token.js";
 import userModel from "../models/userModel.js";
 import bcrypt from "bcryptjs";
+import { sendVerificationEmail } from "../nodemailer/email.js";
 
 export const register = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -38,7 +39,9 @@ export const register = async (req, res) => {
 
     const token = genereateToken(res, newUser._id);
 
-    res.status(201).json({
+    await sendVerificationEmail(newUser.email, verificationToken);
+
+    await res.status(201).json({
       success: true,
       newUser,
       token,
