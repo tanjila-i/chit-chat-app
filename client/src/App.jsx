@@ -6,11 +6,10 @@ import Profile from "./pages/Profile";
 
 const App = () => {
   return (
-    <div className="bg-[#050814] min-h-screen">
+    <div>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-
           <Route path="/login" element={<Login />} />
           <Route path="/profile" element={<Profile />} />
         </Routes>
