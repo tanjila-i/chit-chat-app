@@ -6,7 +6,7 @@ import Profile from "./pages/Profile";
 
 const App = () => {
   return (
-    <div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-600">
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />

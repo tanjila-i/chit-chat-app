@@ -1,4 +1,7 @@
-import { VERIFICATION_EMAIL_TEMPLATE } from "./emailTemplted.js";
+import {
+  PASSWORD_RESET_REQUEST_TEMPLATE,
+  VERIFICATION_EMAIL_TEMPLATE,
+} from "./emailTemplted.js";
 import transporter from "./nodemailer.config.js";
 
 export const sendVerificationEmail = async (email, verificationToken) => {
