@@ -5,6 +5,7 @@ import "dotenv/config";
 import connectDB from "./src/configs/bd.js";
 import userRouter from "./src/routes/userRouter.js";
 import cookieParser from "cookie-parser";
+import messageRoute from "./src/routes/messageRoutes.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 
 // routes
 app.use("/api/users", userRouter);
+app.use("/api/message", messageRoute);
 const port = process.env.PORT || 4000;
 app.listen(port, async () => {
   console.log(`server is running at http://localhost:${port}`);
