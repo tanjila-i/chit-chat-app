@@ -1,3 +1,4 @@
+import cloudinary from "../middlewares/cloudinary.js";
 import messageModel from "../models/messageModel.js";
 import userModel from "../models/userModel.js";
 
@@ -47,10 +48,60 @@ export const getMessagesByUserId = async (req, res) => {
       ],
     });
 
-    res.status(200).json(messages);
+    const seenMessage = await messageModel.updateMany(
+      { senderId: id, receiverId: myId },
+      { seen: true }
+    );
+
+    res.status(200).json({ messages, seenMessage });
   } catch (error) {
     console.log(error.message);
 
     res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const markMessageAsSeen = async (req, res) => {
+  try {
+    const { id } = req.params.id;
+
+    await messageModel.findByIdAndUpdate(id, { seen: true });
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ success: false, message: error.message });
+    console.log(error.message);
+  }
+};
+
+export const sendMessage = async (req, res) => {
+  try {
+    const { text, image } = req.body;
+    const { id: receiverId } = req.params;
+    const senderId = req.user._id;
+
+    let imageUrl;
+
+    if (image) {
+      // upload base64 image to cloudinary
+      const uploadResponse = await cloudinary.uploader.upload(image);
+
+      imageUrl = uploadResponse.secure_url;
+    }
+
+    const newMessage = new messageModel({
+      senderId,
+      receiverId,
+      text,
+      image: imageUrl,
+    });
+
+    await newMessage.save();
+
+    // todo:send message in real-time if user is online -soket io
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.log("Error in sendMessage controller: ", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
